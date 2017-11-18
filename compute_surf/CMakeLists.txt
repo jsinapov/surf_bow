@@ -139,19 +139,20 @@ include_directories(
 # add_dependencies(first_package_cs378 ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 # OpenCV examples
-add_executable(image_processing_example src/image_processing_example.cpp)
-target_link_libraries(image_processing_example ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
+#add_executable(image_processing_example src/image_processing_example.cpp)
+#target_link_libraries(image_processing_example ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
 
-add_executable(motion_history_example src/motion_history_example.cpp)
-target_link_libraries(motion_history_example ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
+#add_executable(motion_history_example src/motion_history_example.cpp)
+#target_link_libraries(motion_history_example ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
 
 
-add_executable(surf_example src/surf_example.cpp)
-target_link_libraries(surf_example ${OpenCV_LIBRARIES} ${catkin_LIBRARIES})
+#add_executable(surf_example src/surf_example.cpp)
+#target_link_libraries(surf_example ${OpenCV_LIBRARIES} ${catkin_LIBRARIES})
 
 
 
 add_executable(process_surf_dataset src/process_surf_dataset.cpp)
+add_dependencies(process_surf_dataset ${catkin_EXPORTED_TARGETS})
 target_link_libraries(process_surf_dataset ${OpenCV_LIBRARIES} ${catkin_LIBRARIES})
 
 
