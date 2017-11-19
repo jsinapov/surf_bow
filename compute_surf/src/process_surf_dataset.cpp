@@ -2,15 +2,22 @@
 #include <image_transport/image_transport.h>
 #include <cv_bridge/cv_bridge.h>
 #include <sensor_msgs/image_encodings.h>
-#include <opencv2/imgproc/imgproc.hpp>
+
+#include <opencv2/core.hpp>
+#include "opencv2/features2d.hpp"
+#include "opencv2/xfeatures2d.hpp"
+#include "opencv2/highgui.hpp"
+//#include <opencv2/nonfree/nonfree.hpp>
+/*#include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/opencv.hpp>  
 
+#include <vector>
 #include <opencv2/features2d/features2d.hpp>
 #include <opencv2/calib3d/calib3d.hpp>
 #include <opencv2/nonfree/nonfree.hpp>
 
-#include <string.h>
+#include <string.h>*/
 
 #include "boost/filesystem/operations.hpp"
 #include "boost/filesystem/path.hpp"
@@ -121,7 +128,8 @@ int main(int argc, char** argv)
 	//create window
 	cv::namedWindow(OUT_WINDOW);
 	
-	
+	std::stringstream dataset_path;
+	dataset_path << "/home/jsinapov/research/datasets/ordering_data/";
 	
 	for (int trial_num = 2; trial_num <= num_trials; trial_num++){
 		
@@ -129,10 +137,8 @@ int main(int argc, char** argv)
 			for (int b = 0; b < 8; b++){
 				std::string behavior = behaviors[b];
 				
-				
-				
 				std::stringstream folder_path;
-				folder_path << "/home/jsinapov/research/datasets/ordering_data/t" << trial_num << "/obj_" << object_id << "/trial_1/" << behavior << "/vision_data";
+				folder_path << dataset_path.str() << "t" << trial_num << "/obj_" << object_id << "/trial_1/" << behavior << "/vision_data";
 				
 				//folder for object, trial and behavior
 				std::string folder = folder_path.str();
@@ -177,17 +183,16 @@ int main(int argc, char** argv)
 					
 					//-- Step 1: Detect the keypoints using SURF Detector
 					int minHessian = 400;
-					cv::SurfFeatureDetector detector( minHessian );
-
+					cv::Ptr<cv::xfeatures2d::SURF> detector = cv::xfeatures2d::SURF::create( minHessian );
+					
 					std::vector<cv::KeyPoint> keypoints_object;
-					detector.detect(outImg, keypoints_object );
-			   
+					detector->detect( outImg, keypoints_object );
+					
+					
 					//-- Step 2: Calculate descriptors (feature vectors)
-					cv::SurfDescriptorExtractor extractor;
 					cv::Mat descriptors;
 
-				
-					extractor.compute( outImg, keypoints_object, descriptors );
+					detector->compute(outImg, keypoints_object, descriptors);
 					
 					/*ROS_INFO("rows = %i",descriptors.rows); 	
 					ROS_INFO("cols = %i",descriptors.cols); 	
@@ -234,10 +239,10 @@ int main(int argc, char** argv)
 					
 					
 					//show output
-					//cv::imshow(OUT_WINDOW, outImg);
+					cv::imshow(OUT_WINDOW, outImg);
 				
 					//pause for 3 ms
-					//cv::waitKey(50);
+					cv::waitKey(50);
 				}
 				
 				fclose(fp);
