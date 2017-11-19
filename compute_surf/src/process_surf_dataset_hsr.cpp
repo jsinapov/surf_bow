@@ -84,7 +84,7 @@ std::vector<cv::Mat> load_images(std::string vision_data_path){
 			dir_itr != end_iter;
 			++dir_itr )
 		{	
-			std::cout << "processing file...\n";
+			//std::cout << "processing file...\n";
 			
 			try
 			{
@@ -93,7 +93,7 @@ std::vector<cv::Mat> load_images(std::string vision_data_path){
 					//check if it is jpg
 					std::string file_full_path = dir_itr->path().string();
 					
-					if (file_full_path.find(".jpg") != std::string::npos && file_full_path.find(".pcd") == std::string::npos){
+					if (file_full_path.find(".png") != std::string::npos && file_full_path.find(".pcd") == std::string::npos){
 						std::cout << dir_itr->path().string() << "\n";
 						
 						cv::Mat img_i;
@@ -116,6 +116,131 @@ std::vector<cv::Mat> load_images(std::string vision_data_path){
 	return images_o_b_t;
 }
 
+cv::Rect getROI(std::string behavior, std::string topic){
+	if (behavior == "shake"){
+		if (topic == "_hsrb_hand_camera_image_rect"){
+			cv::Rect roi = cv::Rect(0,20,450,460);
+			return roi;		
+		}
+		else if (topic == "_hsrb_head_center_camera_image_rect"){
+			cv::Rect roi = cv::Rect(320,35,140,200);
+			return roi;
+		}
+		else if (topic == "_hsrb_head_rgbd_sensor_rgb_image_rect_color"){
+			cv::Rect roi = cv::Rect(400,40,180,280);
+			return roi;
+		}
+	}
+	else if (behavior == "grasp"){
+		if (topic == "_hsrb_hand_camera_image_rect"){
+			cv::Rect roi = cv::Rect(0,20,450,460);
+			return roi;		
+		}
+		else if (topic == "_hsrb_head_center_camera_image_rect"){
+			cv::Rect roi = cv::Rect(340,130,65,135);
+			return roi;
+		}
+		else if (topic == "_hsrb_head_rgbd_sensor_rgb_image_rect_color"){
+			cv::Rect roi = cv::Rect(390,130,110,250);
+			return roi;
+		}
+	}
+	else if (behavior == "hold"){
+		if (topic == "_hsrb_hand_camera_image_rect"){
+			cv::Rect roi = cv::Rect(0,20,450,460);
+			return roi;		
+		}
+		else if (topic == "_hsrb_head_center_camera_image_rect"){
+			cv::Rect roi = cv::Rect(350,50,90,180);
+			return roi;
+		}
+		else if (topic == "_hsrb_head_rgbd_sensor_rgb_image_rect_color"){
+			cv::Rect roi = cv::Rect(410,40,170,270);
+			return roi;
+		}
+		
+	}
+	else if (behavior == "lift"){
+		if (topic == "_hsrb_hand_camera_image_rect"){
+			cv::Rect roi = cv::Rect(0,20,450,460);
+			return roi;		
+		}
+		else if (topic == "_hsrb_head_center_camera_image_rect"){
+			cv::Rect roi = cv::Rect(340,50,110,200);
+			return roi;
+		}
+		else if (topic == "_hsrb_head_rgbd_sensor_rgb_image_rect_color"){
+			cv::Rect roi = cv::Rect(390,50,170,330);
+			return roi;
+		}
+	}
+	else if (behavior == "drop"){
+		if (topic == "_hsrb_hand_camera_image_rect"){
+			cv::Rect roi = cv::Rect(0,20,450,460);
+			return roi;		
+		}
+		else if (topic == "_hsrb_head_center_camera_image_rect"){
+			cv::Rect roi = cv::Rect(320,110,90,160);
+			return roi;
+		}
+		else if (topic == "_hsrb_head_rgbd_sensor_rgb_image_rect_color"){
+			cv::Rect roi = cv::Rect(360,60,160,320);
+			return roi;
+		}
+	}
+	else if (behavior == "press_top_fast" || behavior == "press_top_slow"){
+		if (topic == "_hsrb_hand_camera_image_rect"){
+			cv::Rect roi = cv::Rect(0,20,450,460);
+			return roi;		
+		}
+		else if (topic == "_hsrb_head_center_camera_image_rect"){
+			cv::Rect roi = cv::Rect(260,40,140,260);
+			return roi;
+		}
+		else if (topic == "_hsrb_head_rgbd_sensor_rgb_image_rect_color"){
+			cv::Rect roi = cv::Rect(250,50,190,370);
+			return roi;
+		}
+	}
+	else if (behavior == "push_side"){
+		if (topic == "_hsrb_hand_camera_image_rect"){
+			cv::Rect roi = cv::Rect(0,20,450,460);
+			return roi;		
+		}
+		else if (topic == "_hsrb_head_center_camera_image_rect"){
+			cv::Rect roi = cv::Rect(330,100,120,170);
+			return roi;
+		}
+		else if (topic == "_hsrb_head_rgbd_sensor_rgb_image_rect_color"){
+			cv::Rect roi = cv::Rect(280,110,310,310);
+			return roi;
+		}
+	}
+	else if (behavior == "look"){
+		if (topic == "_hsrb_hand_camera_image_rect"){
+			cv::Rect roi = cv::Rect(315,290,65,130);
+			return roi;		
+		}
+		else if (topic == "_hsrb_head_center_camera_image_rect"){
+			cv::Rect roi = cv::Rect(270,170,70,130);
+			return roi;
+		}
+		else if (topic == "_hsrb_head_rgbd_sensor_rgb_image_rect_color"){
+			cv::Rect roi = cv::Rect(245,190,145,240);
+			return roi;
+		}
+	}
+	
+}
+
+int getHessianSize(std::string topic){
+	if (topic == "_hsrb_hand_camera_image_rect"){
+		return 200;
+	}
+	else return 400;
+}
+
+
 int main(int argc, char** argv)
 {
 	std::string path = "";
@@ -123,22 +248,28 @@ int main(int argc, char** argv)
 	int num_objects = 32;
 	int num_trials = 5;
 	
-	std::string behaviors[] = {"look","grasp","lift","hold","lower","drop","push","press"};
+	std::string behaviors[] = {"look","grasp","lift","hold","shake","lower","drop","push_side","press_top_slow","press_top_fast"};
+	//std::string behaviors[] = {"look"};
+	int num_behaviors = 10;
 	
 	//create window
 	cv::namedWindow(OUT_WINDOW);
 	
 	std::stringstream dataset_path;
-	dataset_path << "/home/jsinapov/research/datasets/ordering_data/";
+	dataset_path << "/home/jsinapov/research/datasets/hsr_data/";
 	
-	for (int trial_num = 2; trial_num <= num_trials; trial_num++){
+	//which image topic
+	std::string image_topics [] = {"_hsrb_hand_camera_image_rect","_hsrb_head_center_camera_image_rect","_hsrb_head_rgbd_sensor_rgb_image_rect_color"} ;
+	int topic_idx = 1;
+	
+	for (int trial_num = 1; trial_num <= 1; trial_num++){
 		
-		for (int object_id = 1; object_id <= 32; object_id++){
-			for (int b = 0; b < 8; b++){
+		for (int object_id = 1; object_id <= 1; object_id++){
+			for (int b = 0; b < num_behaviors; b++){
 				std::string behavior = behaviors[b];
 				
 				std::stringstream folder_path;
-				folder_path << dataset_path.str() << "t" << trial_num << "/obj_" << object_id << "/trial_1/" << behavior << "/vision_data";
+				folder_path << dataset_path.str() << "trial" << trial_num << "/" << object_id << "/" << behavior << "/vision_data/" << image_topics[topic_idx];
 				
 				//folder for object, trial and behavior
 				std::string folder = folder_path.str();
@@ -159,30 +290,14 @@ int main(int argc, char** argv)
 					cv::Mat outImg = images_o_b_t.at(k);
 					
 					//set ROI based on behavior
-					if (behavior == "grasp" || behavior == "look"){
-						cv::Rect roi = cv::Rect(202,154,120,170);
-						outImg = outImg(roi);
-					}
-					else if (behavior == "lift" || behavior == "hold" || behavior == "lower"){
-						cv::Rect roi = cv::Rect(202,0,120,240);
-						outImg = outImg(roi);
-					}
-					else if (behavior == "drop"){
-						cv::Rect roi = cv::Rect(70,130,250,310);
-						outImg = outImg(roi);
-					}
-					else if (behavior == "push"){
-						cv::Rect roi = cv::Rect(100,140,275,250);
-						outImg = outImg(roi);
-					}
-					else if (behavior == "press"){
-						cv::Rect roi = cv::Rect(100,160,275,250);
-						outImg = outImg(roi);
-					}
+					cv::Rect roi = getROI(behavior,image_topics[topic_idx]);
+					outImg = outImg(roi);
+					
+					
 					
 					
 					//-- Step 1: Detect the keypoints using SURF Detector
-					int minHessian = 400;
+					int minHessian = getHessianSize(image_topics[topic_idx]);
 					cv::Ptr<cv::xfeatures2d::SURF> detector = cv::xfeatures2d::SURF::create( minHessian );
 					
 					std::vector<cv::KeyPoint> keypoints_object;

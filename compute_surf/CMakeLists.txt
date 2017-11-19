@@ -156,6 +156,11 @@ add_dependencies(process_surf_dataset ${catkin_EXPORTED_TARGETS})
 target_link_libraries(process_surf_dataset ${OpenCV_LIBRARIES} ${catkin_LIBRARIES})
 
 
+add_executable(process_surf_dataset_hsr src/process_surf_dataset_hsr.cpp)
+add_dependencies(process_surf_dataset_hsr ${catkin_EXPORTED_TARGETS})
+target_link_libraries(process_surf_dataset_hsr ${OpenCV_LIBRARIES} ${catkin_LIBRARIES})
+
+
 
 
 #############
