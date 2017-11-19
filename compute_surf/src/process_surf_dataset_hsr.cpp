@@ -24,6 +24,8 @@
 #include "boost/progress.hpp"
 
 
+#define SHOW_IMAGE false
+
 namespace fs = boost::filesystem;
 
 static const std::string OPENCV_WINDOW = "Image window";
@@ -123,11 +125,11 @@ cv::Rect getROI(std::string behavior, std::string topic){
 			return roi;		
 		}
 		else if (topic == "_hsrb_head_center_camera_image_rect"){
-			cv::Rect roi = cv::Rect(320,35,140,200);
+			cv::Rect roi = cv::Rect(320,0,200,240);
 			return roi;
 		}
 		else if (topic == "_hsrb_head_rgbd_sensor_rgb_image_rect_color"){
-			cv::Rect roi = cv::Rect(400,40,180,280);
+			cv::Rect roi = cv::Rect(400,0,210,360);
 			return roi;
 		}
 	}
@@ -137,11 +139,11 @@ cv::Rect getROI(std::string behavior, std::string topic){
 			return roi;		
 		}
 		else if (topic == "_hsrb_head_center_camera_image_rect"){
-			cv::Rect roi = cv::Rect(340,130,65,135);
+			cv::Rect roi = cv::Rect(340,60,95,205);
 			return roi;
 		}
 		else if (topic == "_hsrb_head_rgbd_sensor_rgb_image_rect_color"){
-			cv::Rect roi = cv::Rect(390,130,110,250);
+			cv::Rect roi = cv::Rect(390,70,150,310);
 			return roi;
 		}
 	}
@@ -151,26 +153,26 @@ cv::Rect getROI(std::string behavior, std::string topic){
 			return roi;		
 		}
 		else if (topic == "_hsrb_head_center_camera_image_rect"){
-			cv::Rect roi = cv::Rect(350,50,90,180);
+			cv::Rect roi = cv::Rect(350,0,130,230);
 			return roi;
 		}
 		else if (topic == "_hsrb_head_rgbd_sensor_rgb_image_rect_color"){
-			cv::Rect roi = cv::Rect(410,40,170,270);
+			cv::Rect roi = cv::Rect(410,0,210,310);
 			return roi;
 		}
 		
 	}
-	else if (behavior == "lift"){
+	else if (behavior == "lift" || behavior == "lower"){
 		if (topic == "_hsrb_hand_camera_image_rect"){
 			cv::Rect roi = cv::Rect(0,20,450,460);
 			return roi;		
 		}
 		else if (topic == "_hsrb_head_center_camera_image_rect"){
-			cv::Rect roi = cv::Rect(340,50,110,200);
+			cv::Rect roi = cv::Rect(340,0,120,250);
 			return roi;
 		}
 		else if (topic == "_hsrb_head_rgbd_sensor_rgb_image_rect_color"){
-			cv::Rect roi = cv::Rect(390,50,170,330);
+			cv::Rect roi = cv::Rect(390,0,220,380);
 			return roi;
 		}
 	}
@@ -180,11 +182,11 @@ cv::Rect getROI(std::string behavior, std::string topic){
 			return roi;		
 		}
 		else if (topic == "_hsrb_head_center_camera_image_rect"){
-			cv::Rect roi = cv::Rect(320,110,90,160);
+			cv::Rect roi = cv::Rect(320,60,130,210);
 			return roi;
 		}
 		else if (topic == "_hsrb_head_rgbd_sensor_rgb_image_rect_color"){
-			cv::Rect roi = cv::Rect(360,60,160,320);
+			cv::Rect roi = cv::Rect(360,60,180,325);
 			return roi;
 		}
 	}
@@ -198,7 +200,7 @@ cv::Rect getROI(std::string behavior, std::string topic){
 			return roi;
 		}
 		else if (topic == "_hsrb_head_rgbd_sensor_rgb_image_rect_color"){
-			cv::Rect roi = cv::Rect(250,50,190,370);
+			cv::Rect roi = cv::Rect(240,50,200,370);
 			return roi;
 		}
 	}
@@ -208,11 +210,11 @@ cv::Rect getROI(std::string behavior, std::string topic){
 			return roi;		
 		}
 		else if (topic == "_hsrb_head_center_camera_image_rect"){
-			cv::Rect roi = cv::Rect(330,100,120,170);
+			cv::Rect roi = cv::Rect(330,70,170,200);
 			return roi;
 		}
 		else if (topic == "_hsrb_head_rgbd_sensor_rgb_image_rect_color"){
-			cv::Rect roi = cv::Rect(280,110,310,310);
+			cv::Rect roi = cv::Rect(280,70,340,350);
 			return roi;
 		}
 	}
@@ -222,11 +224,11 @@ cv::Rect getROI(std::string behavior, std::string topic){
 			return roi;		
 		}
 		else if (topic == "_hsrb_head_center_camera_image_rect"){
-			cv::Rect roi = cv::Rect(270,170,70,130);
+			cv::Rect roi = cv::Rect(270,120,70,180);
 			return roi;
 		}
 		else if (topic == "_hsrb_head_rgbd_sensor_rgb_image_rect_color"){
-			cv::Rect roi = cv::Rect(245,190,145,240);
+			cv::Rect roi = cv::Rect(245,160,155,270);
 			return roi;
 		}
 	}
@@ -249,7 +251,7 @@ int main(int argc, char** argv)
 	int num_trials = 5;
 	
 	std::string behaviors[] = {"look","grasp","lift","hold","shake","lower","drop","push_side","press_top_slow","press_top_fast"};
-	//std::string behaviors[] = {"look"};
+	//std::string behaviors[] = {"lower"};
 	int num_behaviors = 10;
 	
 	//create window
@@ -260,11 +262,12 @@ int main(int argc, char** argv)
 	
 	//which image topic
 	std::string image_topics [] = {"_hsrb_hand_camera_image_rect","_hsrb_head_center_camera_image_rect","_hsrb_head_rgbd_sensor_rgb_image_rect_color"} ;
-	int topic_idx = 1;
+	std::string out_topic_names [] = {"hand","headcenter","headasus"};
+	int topic_idx = 2;
 	
 	for (int trial_num = 1; trial_num <= 1; trial_num++){
 		
-		for (int object_id = 1; object_id <= 1; object_id++){
+		for (int object_id = 1; object_id <= 32; object_id++){
 			for (int b = 0; b < num_behaviors; b++){
 				std::string behavior = behaviors[b];
 				
@@ -282,7 +285,7 @@ int main(int argc, char** argv)
 				
 				//save to file
 				std::stringstream out_file;
-				out_file << "obj" << object_id << "_trial" << trial_num << "_" << behavior << ".surf.txt";
+				out_file << "obj" << object_id << "_" << out_topic_names[topic_idx] << "_trial" << trial_num << "_" << behavior << ".surf.txt";
 					
 				FILE *fp = fopen(out_file.str().c_str(), "w");
 				
@@ -321,13 +324,15 @@ int main(int argc, char** argv)
 					
 
 					//plot points
-					for (unsigned int i = 0; i < keypoints_object.size(); i++){
-						int x = keypoints_object.at(i).pt.x;
-						int y = keypoints_object.at(i).pt.y;
-					
+					if (SHOW_IMAGE){
+						for (unsigned int i = 0; i < keypoints_object.size(); i++){
+							int x = keypoints_object.at(i).pt.x;
+							int y = keypoints_object.at(i).pt.y;
 						
-						cv::circle(outImg, cv::Point(x, y), 5, CV_RGB(255,0,0));
-					} 
+							
+							cv::circle(outImg, cv::Point(x, y), 5, CV_RGB(255,0,0));
+						} 
+					}
 					
 					
 					
@@ -352,12 +357,13 @@ int main(int argc, char** argv)
 					}
 					
 					
+					if (SHOW_IMAGE){
+						//show output
+						cv::imshow(OUT_WINDOW, outImg);
 					
-					//show output
-					cv::imshow(OUT_WINDOW, outImg);
-				
-					//pause for 3 ms
-					cv::waitKey(50);
+						//pause for 3 ms
+						cv::waitKey(50);
+					}
 				}
 				
 				fclose(fp);
